@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('bloggroup.urls')),
     path('', include('authenticate.urls')),
     path('', include('patients.urls')),
+    path('blog/', include('blog.urls')),
 ]
