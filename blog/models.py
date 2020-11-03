@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
+# from ckeditor.fields import RichTextField   # finally removed because of confilct w/ Markdown
+from django.urls import reverse
 
 
 # Create your models here.
@@ -23,6 +25,7 @@ class Post(models.Model):
                               on_delete=models.CASCADE,
                               related_name='blog_posts')
     body = models.TextField()
+    # body = RichTextField()  # only used for ckeditor w/o uploader function.
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

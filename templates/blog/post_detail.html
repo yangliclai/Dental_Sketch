@@ -1,4 +1,5 @@
 {% extends "blog/blog_base.html" %}
+{% load blog_tags %}
 
 {% block title %}{{ post.title }}{% endblock %}
 
@@ -18,7 +19,7 @@
   <p class="date">
     Published {{ post.publish }} by {{ post.author }}
   </p>
-  {{ post.body|linebreaks }}
+  {{ post.body|markdown }}
 {# the <a> share part is added from chp002</a> #}
   <p>
     <a href="{% url "post_share" post.id %}">
@@ -26,15 +27,17 @@
     </a>
   </p>
 
-
-  <h2>Similar posts</h2>
-  {% for post in similar_posts %}
-    <p>
-      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-    </p>
-  {% empty %}
-    There are no similar posts yet.
-  {% endfor %}
+<!-- Completely remove the redundant block of "Similiar Posts" @20201031 -->
+{#  <h2>Similar posts</h2>#}
+{#  {% for post in similar_posts %}#}
+{#    <p>#}
+{#    <li>#}
+{#      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>#}
+{#    </p>#}
+{#    </li>#}
+{#  {% empty %}#}
+{#    There are no similar posts yet.#}
+{#  {% endfor %}#}
 
 
   {% with comments.count as total_comments %}
@@ -70,11 +73,15 @@
 
 {% block sidebar_content %}
   <h2>Similar posts</h2>
-  {% for post in similar_posts %}
-    <p>
-      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-    </p>
-  {% empty %}
-    There are no similar posts yet.
-  {% endfor %}
+  <ul>
+      {% for post in similar_posts %}
+    {#    <p>#}
+        <li>
+          <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    {#    </p>#}
+        </li>
+      {% empty %}
+        There are no similar posts yet.
+      {% endfor %}
+  </ul>
 {% endblock %}
