@@ -8,6 +8,7 @@ from .forms import EmailPostForm, CommentForm, SearchForm
 from taggit.models import Tag
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
 
 
 def post_list(request, tag_slug=None):
@@ -111,24 +112,27 @@ def post_share(request, post_id):
 
 
 def post_search(request):
-    form = SearchForm()
-    query = None
-    results = []
-    if 'query' in request.GET:
-        form = SearchForm(request.GET)
-        if form.is_valid():
-            query = form.cleaned_data['query']
-            search_vector = SearchVector('title', 'body')
-            search_query = SearchQuery(query)
-            # results = Post.published.annotate(search=search_vector, rank=SearchRank(search_vector, search_query))\
-            #     .filter(search=search_query).order_by('-rank')
-            results = Post.published.annotate(
-                similarity=TrigramSimilarity('title', query),
-            ).filter(similarity__gt=0.1).order_by('-similarity')
-            # similarity=TrigramSimilarity('title', query),
-            # ).filter(similarity__gt=0.1).order_by('-similarity')
-    return render(request,
-                  'blog/post_search.html',
-                  {'form': form,
-                   'query': query,
-                   'results': results})
+    keyword = request.GET.get('keyword')
+    if not keyword:
+        error_msg = "please input keyword for searching!"
+        return render(request, 'blog/post_search.html', {'error_msg': error_msg})
+    else:
+        # query = form.cleaned_data['query']
+
+        search_vector = SearchVector('title', 'body')
+        search_query = SearchQuery(keyword)
+
+        results_01 = Post.published.annotate(search=search_vector, rank=SearchRank(search_vector, search_query), ).filter(search=search_query).order_by('-rank')
+
+        # results_03 = Post.published.filter(title__startswith='who')
+        # results_02 = Post.published.annotate(similarity=TrigramSimilarity('title', keyword),).filter(similarity__gt=0.1).order_by('-similarity')
+
+        # results = (results_fulltext | results_similar).distinct()  # NOT work for two queryset has extra field(e.g rank, similiarty) separately
+
+        return render(request,
+                      'blog/post_search.html',
+                      {'keyword': keyword,
+                       'results': results_01})
+        # return render(request, 'blog/post_search.html', {'keyword': keyword})
+
+

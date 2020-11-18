@@ -16,4 +16,6 @@ class CommentForm(forms.ModelForm):
 
 
 class SearchForm(forms.Form):
-    query = forms.CharField()
+    # query = forms.CharField()
+    q = forms.CharField(label='search',
+                        widget=forms.TextInput(attrs={'placeholder': 'Search_try'}))
